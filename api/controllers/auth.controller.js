@@ -7,7 +7,6 @@ export const register = async (req, res) => {
   // hash the password
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
     // create a new user, sent to the database
     const newUser = await prisma.user.create({
       data: {
@@ -59,6 +58,8 @@ export const login = async (req, res) => {
       }
     );
 
+    const { password: userPassword, ...userInfo } = user;
+
     res
       .cookie("token", token, {
         httpOnly: true,
@@ -66,7 +67,7 @@ export const login = async (req, res) => {
         maxAge: age,
       })
       .status(200)
-      .json({ message: "User logged in successfully" });
+      .json(userInfo);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to login!" });
