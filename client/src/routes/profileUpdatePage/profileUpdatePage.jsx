@@ -11,13 +11,13 @@ function ProfileUpdatePage() {
 
   const { currentUser, updateUser } = useContext(AuthContext);
 
-  const [avatar, setAvatar] = useState(currentUser?.avatar);
+  const [avatar, setAvatar] = useState([]);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setDisabled(true)
+    setDisabled(true);
     const form = new FormData(e.target);
 
     const { username, email, password } = Object.fromEntries(form); // Object.fromEntries() method transforms a list of key-value pairs into an object.
@@ -27,7 +27,7 @@ function ProfileUpdatePage() {
         username,
         email,
         password,
-        avatar,
+        avatar: avatar[0],
       });
       updateUser(res.data);
       navigate("/profile");
@@ -72,7 +72,7 @@ function ProfileUpdatePage() {
       <div className="sideContainer">
         <img
           src={
-            avatar ||
+            avatar[0] || currentUser?.avatar ||
             "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           }
           alt=""
@@ -86,7 +86,7 @@ function ProfileUpdatePage() {
             maxImageFileSize: 10000000,
             folder: "avatars",
           }}
-          setAvatar={setAvatar}
+          setState={setAvatar}
         />
       </div>
     </div>
