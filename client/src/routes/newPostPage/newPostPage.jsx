@@ -34,7 +34,7 @@ function NewPostPage() {
           images: images,
         },
         postDetail: {
-          desc: value,
+          desc: inputs.desc,
           utilities: inputs.utilities,
           pet: inputs.pet,
           income: inputs.income,
@@ -72,7 +72,7 @@ function NewPostPage() {
             </div>
             <div className="item description">
               <label htmlFor="desc">Description</label>
-              <ReactQuill theme="snow" onChange={setValue} value={value} />
+              <textarea id="desc" name="desc" />
             </div>
             <div className="item">
               <label htmlFor="city">City</label>

@@ -45,7 +45,7 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
 
-    const age = 1000 * 60 * 60 * 24 * 7; // 1 week
+    const age = 1000 * 60 * 60 * 24 * 7; // 1 week validity
 
     // generate a token
     const token = jwt.sign(
