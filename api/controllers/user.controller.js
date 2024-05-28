@@ -45,11 +45,11 @@ export const updateUser = async (req, res) => {
       data: {
         ...inputs,
         ...(updatedPassword && { password: updatedPassword }),
-        ...(avatar && { avatar })
+        ...(avatar && { avatar }),
       },
     });
 
-    const {password: userPassword, ...rest}  = user;
+    const { password: userPassword, ...rest } = user;
 
     res.status(200).json(rest);
   } catch (err) {
@@ -74,5 +74,40 @@ export const deleteUser = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to delete users!" });
+  }
+};
+
+export const savePost = async (req, res) => {
+  const postId = req.body.postId;
+  const tokenUserId = req.userId;
+
+  try {
+    const savedPost = await prisma.savedPost.findUnique({
+      where: {
+          userId: tokenUserId,
+          postId,
+      },
+    });
+
+    if (savedPost) {
+      await prisma.savedPost.delete({
+        where: {
+          id: savedPost.id,
+        }
+      });
+      res.status(200).json({ message: "Post unsaved successfully!" });
+    } else {
+      await prisma.savedPost.create({
+        data: {
+          userId: tokenUserId,
+          postId,
+        }
+      });
+      res.status(200).json({ message: "Post saved successfully!" });
+    }
+    
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to save post!" });
   }
 };
