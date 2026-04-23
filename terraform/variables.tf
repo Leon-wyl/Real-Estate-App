@@ -21,3 +21,9 @@ variable "client_url" {
   type        = string
   default     = "http://localhost:5173"
 }
+
+variable "domain_name" {
+  description = "The root domain name"
+  type        = string
+  default     = "leonrealestate.uk"
+}
