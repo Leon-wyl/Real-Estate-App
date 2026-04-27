@@ -19,6 +19,9 @@ RUN npx prisma generate
 # Copy source code
 COPY . .
 
+# Build TypeScript code
+RUN npm run build
+
 # Production stage
 FROM --platform=linux/amd64 node:20-alpine
 
@@ -27,12 +30,13 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copy from builder
+# Copy necessary files from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app .
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 8800
 
-CMD ["node", "app.js"]
+# Run the compiled code
+CMD ["npm", "start"]
