@@ -12,6 +12,10 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Real Estate API is running!" });
+});
+
 app.use("/api/posts", postRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/test", testRoute);
