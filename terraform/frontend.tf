@@ -60,11 +60,6 @@ resource "aws_acm_certificate" "main" {
   }
 }
 
-# Route 53 Hosted Zone (Still useful to keep for tracking)
-resource "aws_route53_zone" "main" {
-  name = var.domain_name
-}
-
 # CloudFront Distribution
 resource "aws_cloudfront_distribution" "frontend" {
   origin {
@@ -123,9 +118,4 @@ resource "aws_cloudfront_distribution" "frontend" {
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
-}
-
-# Output nameservers (optional)
-output "nameservers" {
-  value = aws_route53_zone.main.name_servers
 }
