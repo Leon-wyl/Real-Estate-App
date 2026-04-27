@@ -25,9 +25,9 @@ ECR_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/real-estate-api"
 
 case "$1" in
     backend)
-        echo -e "${BLUE}1. Deploying Backend Infrastructure...${NC}"
+        echo -e "${BLUE}1. Deploying Backend Infrastructure (App Runner)...${NC}"
         cd terraform
-        terraform apply -target=aws_ecs_service.main -target=aws_lb.main -target=aws_ecr_repository.api
+        terraform apply -target=aws_apprunner_service.api -target=aws_ecr_repository.api -target=aws_iam_role.apprunner_access_role -target=aws_iam_role.apprunner_instance_role -target=aws_iam_role_policy_attachment.apprunner_access_policy -auto-approve
         
         echo -e "${BLUE}2. Authenticating with ECR...${NC}"
         aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
@@ -38,19 +38,14 @@ case "$1" in
         docker tag real-estate-api:latest ${ECR_URL}:latest
         docker push ${ECR_URL}:latest
         
-        echo -e "${BLUE}4. Forcing ECS Redeploy...${NC}"
-        aws ecs update-service --cluster real-estate-cluster --service real-estate-service --force-new-deployment --region ${REGION}
-        
-        echo -e "${GREEN}Backend deployment complete!${NC}"
+        echo -e "${YELLOW}Note: App Runner is configured with auto-deployments. It will start the new version automatically.${NC}"
+        echo -e "${GREEN}Backend deployment initiated!${NC}"
         ;;
         
     frontend)
         echo -e "${BLUE}1. Deploying Frontend Infrastructure...${NC}"
         cd terraform
-        terraform apply -target=aws_cloudfront_distribution.frontend -target=aws_s3_bucket.frontend
-        
-        # Get CloudFront ID and S3 Bucket for syncing
-        DIST_ID=$(terraform output -raw cloudfront_domain_name) # We actually need the ID, but let's assume we can sync to S3 first
+        terraform apply -target=aws_cloudfront_distribution.frontend -target=aws_s3_bucket.frontend -auto-approve
         
         echo -e "${BLUE}2. Building Frontend...${NC}"
         cd ../client
