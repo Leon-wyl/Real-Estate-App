@@ -78,6 +78,24 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+export const getNotificationNumber = async (req: Request, res: Response) => {
+  const tokenUserId = req.userId!;
+  try {
+    const count = await prisma.chat.count({
+      where: {
+        userIDs: { has: tokenUserId },
+        NOT: {
+          seenBy: { has: tokenUserId },
+        },
+      },
+    });
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to get notification count!" });
+  }
+};
+
 export const savePost = async (req: Request, res: Response) => {
   const postId = req.body.postId;
   const tokenUserId = req.userId;

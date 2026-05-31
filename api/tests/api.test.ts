@@ -21,6 +21,17 @@ const mocks = vi.hoisted(() => ({
       create: vi.fn(),
       delete: vi.fn(),
     },
+    chat: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+    },
+    message: {
+      create: vi.fn(),
+    },
   },
   bcrypt: {
     hash: vi.fn(),
@@ -282,6 +293,134 @@ describe("API routes", () => {
       expect((await request(app).post("/api/users/save").set("Cookie", validCookie).send({ postId: "post-1" })).body).toEqual({
         message: "Post unsaved successfully!",
       });
+    });
+
+    it("gets notification count", async () => {
+      mocks.prisma.chat.count.mockResolvedValue(2);
+
+      const res = await request(app)
+        .get("/api/users/notification")
+        .set("Cookie", validCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ count: 2 });
+    });
+  });
+
+  describe("chat routes", () => {
+    it("rejects without token", async () => {
+      expect((await request(app).get("/api/chats")).status).toBe(401);
+      expect((await request(app).get("/api/chats/chat-1")).status).toBe(401);
+      expect((await request(app).post("/api/chats").send({ receiverId: "user-2" })).status).toBe(401);
+      expect((await request(app).put("/api/chats/read/chat-1")).status).toBe(401);
+    });
+
+    it("lists chats for authenticated user", async () => {
+      mocks.prisma.chat.findMany.mockResolvedValue([{ id: "chat-1", userIDs: ["user-1", "user-2"] }]);
+
+      const res = await request(app).get("/api/chats").set("Cookie", validCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual([{ id: "chat-1", userIDs: ["user-1", "user-2"] }]);
+    });
+
+    it("gets a single chat", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue({ id: "chat-1", userIDs: ["user-1", "user-2"], messages: [] });
+
+      const res = await request(app).get("/api/chats/chat-1").set("Cookie", validCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ id: "chat-1", userIDs: ["user-1", "user-2"], messages: [] });
+    });
+
+    it("creates a new chat", async () => {
+      mocks.prisma.chat.findFirst.mockResolvedValue(null);
+      mocks.prisma.chat.create.mockResolvedValue({ id: "chat-1", userIDs: ["user-1", "user-2"] });
+
+      const res = await request(app)
+        .post("/api/chats")
+        .set("Cookie", validCookie)
+        .send({ receiverId: "user-2" });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ id: "chat-1", userIDs: ["user-1", "user-2"] });
+    });
+
+    it("rejects addChat without receiverId", async () => {
+      const res = await request(app)
+        .post("/api/chats")
+        .set("Cookie", validCookie)
+        .send({});
+
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({ message: "receiverId is required!" });
+    });
+
+    it("reads a chat", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue({ id: "chat-1", userIDs: ["user-1", "user-2"], seenBy: [] });
+      mocks.prisma.chat.update.mockResolvedValue({ id: "chat-1", seenBy: ["user-1"] });
+
+      const res = await request(app).put("/api/chats/read/chat-1").set("Cookie", validCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ id: "chat-1", seenBy: ["user-1"] });
+    });
+
+    it("reads an already seen chat", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue({ id: "chat-1", userIDs: ["user-1", "user-2"], seenBy: ["user-1"] });
+
+      const res = await request(app).put("/api/chats/read/chat-1").set("Cookie", validCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ id: "chat-1", userIDs: ["user-1", "user-2"], seenBy: ["user-1"] });
+    });
+
+    it("rejects read for non-member", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue({ id: "chat-1", userIDs: ["user-2", "user-3"] });
+
+      const res = await request(app).put("/api/chats/read/chat-1").set("Cookie", validCookie);
+
+      expect(res.status).toBe(403);
+    });
+  });
+
+  describe("message routes", () => {
+    it("rejects without token", async () => {
+      expect((await request(app).post("/api/messages/chat-1").send({ text: "hello" })).status).toBe(401);
+    });
+
+    it("adds a message to a chat", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue({ id: "chat-1", userIDs: ["user-1", "user-2"] });
+      mocks.prisma.message.create.mockResolvedValue({ id: "msg-1", text: "hello", userId: "user-1", chatId: "chat-1" });
+
+      const res = await request(app)
+        .post("/api/messages/chat-1")
+        .set("Cookie", validCookie)
+        .send({ text: "hello" });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ id: "msg-1", text: "hello", userId: "user-1", chatId: "chat-1" });
+    });
+
+    it("returns 404 for missing chat", async () => {
+      mocks.prisma.chat.findUnique.mockResolvedValue(null);
+
+      const res = await request(app)
+        .post("/api/messages/missing")
+        .set("Cookie", validCookie)
+        .send({ text: "hello" });
+
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 400 for empty text", async () => {
+      const res = await request(app)
+        .post("/api/messages/chat-1")
+        .set("Cookie", validCookie)
+        .send({ text: "" });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({ message: "Text is required!" });
     });
   });
 });
