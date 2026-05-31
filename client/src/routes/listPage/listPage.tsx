@@ -1,4 +1,3 @@
-import "./listPage.scss";
 import Filter from "../../components/filter/Filter";
 import Card from "../../components/card/Card";
 import Map from "../../components/map/Map";
@@ -14,9 +13,9 @@ function ListPage() {
   const data = useLoaderData() as ListPageLoaderData;
 
   return (
-    <div className="listPage">
-      <div className="listContainer">
-        <div className="wrapper">
+    <div className="flex h-full">
+      <div className="flex-[3] h-full">
+        <div className="h-full pr-[50px] flex flex-col gap-[50px] overflow-y-scroll pb-[50px]">
           <Filter />
           <Suspense fallback={<div>Loading...</div>}>
             <Await
@@ -32,7 +31,7 @@ function ListPage() {
           </Suspense>
         </div>
       </div>
-      <div className="mapContainer">
+      <div className="flex-[2] h-full bg-[#fcf5f3] max-[1024px]:hidden">
         <Suspense fallback={<div>Loading...</div>}>
           <Await
             resolve={data.postResponse}

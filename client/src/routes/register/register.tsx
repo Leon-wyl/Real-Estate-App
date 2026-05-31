@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import apiRequest from "../../lib/apiRequest";
 
@@ -32,20 +31,45 @@ function Register() {
     }
   };
   return (
-    <div className="register">
-      <div className="formContainer">
-        <form onSubmit={handleSubmit}>
-          <h1>Create an Account</h1>
-          <input name="username" type="text" placeholder="Username" required />
-          <input name="email" type="email" placeholder="Email" required />
-          <input name="password" type="password" placeholder="Password" required />
-          <button disabled={isLoading}>Register</button>
-          {error && <span className="error">{error}</span>}
-          <Link to="/login">Do you have an account?</Link>
+    <div className="h-full flex">
+      <div className="flex-[3] h-full flex items-center justify-center">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <h1 className="text-4xl font-bold">Create an Account</h1>
+          <input
+            name="username"
+            type="text"
+            placeholder="Username"
+            required
+            className="p-5 border border-gray-300 rounded-md"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            className="p-5 border border-gray-300 rounded-md"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            className="p-5 border border-gray-300 rounded-md"
+          />
+          <button
+            disabled={isLoading}
+            className="p-5 rounded-md border-none bg-teal-600 text-white font-bold cursor-pointer disabled:bg-[#BED9D8] disabled:cursor-not-allowed"
+          >
+            Register
+          </button>
+          {error && <span className="text-[rgba(255,0,0,0.591)]">{error}</span>}
+          <Link to="/login" className="text-sm text-gray-500 border-b border-gray-500 w-max">
+            Do you have an account?
+          </Link>
         </form>
       </div>
-      <div className="imgContainer">
-        <img src="/bg.png" alt="" />
+      <div className="flex-[2] bg-[#fcf5f3] flex items-center justify-center max-[1024px]:hidden">
+        <img src="/bg.png" alt="" className="w-full" />
       </div>
     </div>
   );
