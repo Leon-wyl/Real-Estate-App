@@ -59,5 +59,3 @@ This project uses a unified deployment script:
 - `./deploy.sh frontend`: Deploys React app to S3/CloudFront.
 - `./deploy.sh all`: Deploys both services.
 
----
-*For detailed module documentation, see [api/GEMINI.md](./api/GEMINI.md) and [client/GEMINI.md](./client/GEMINI.md).*
