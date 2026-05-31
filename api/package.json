@@ -5,7 +5,13 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/app.js",
+    "dev": "tsx watch app.ts",
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest run",
+    "test:controllers": "vitest run tests/controllers.test.ts",
+    "test:api": "vitest run tests/api.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +26,20 @@
     "mongodb": "^6.5.0"
   },
   "devDependencies": {
-    "prisma": "^5.13.0"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "@types/supertest": "^7.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "eslint": "^8.57.1",
+    "prisma": "^5.13.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
   }
 }

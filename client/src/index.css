@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply p-0 m-0 box-border;
+  }
+
+  a {
+    @apply no-underline text-inherit;
+  }
+
+  body {
+    font-family: "Lato", sans-serif;
+    @apply overflow-hidden;
+  }
+}
