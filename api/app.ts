@@ -21,6 +21,10 @@ app.use("/api/auth", authRoute);
 app.use("/api/test", testRoute);
 app.use("/api/users", userRoute);
 
-app.listen(8800, () => {
-  console.log("Server is running on port 8800");
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(8800, () => {
+    console.log("Server is running on port 8800");
+  });
+}
+
+export default app;
