@@ -6,6 +6,7 @@ import request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 vi.mock('bcrypt', () => ({
   hash: vi.fn().mockResolvedValue('hashed-password'),
@@ -118,6 +119,20 @@ describe('App (e2e)', () => {
         .send({ username: 'alice' });
 
       expect(res.status).toBe(400);
+    });
+
+    it('POST /api/auth/register — returns 409 for duplicate user', async () => {
+      const p2002Error = new Prisma.PrismaClientKnownRequestError('Unique constraint', {
+        code: 'P2002',
+        clientVersion: '5.13.0',
+      });
+      mockPrisma.user.create.mockRejectedValueOnce(p2002Error);
+
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({ username: 'alice', email: 'alice@test.com', password: 'secret' });
+
+      expect(res.status).toBe(409);
     });
 
     it('POST /api/auth/login — sets token cookie', async () => {
@@ -284,22 +299,28 @@ describe('App (e2e)', () => {
   });
 
   describe('User Routes', () => {
-    it('GET /api/users — lists users', async () => {
-      mockPrisma.user.findMany.mockResolvedValueOnce([{ id: 'user-1' }]);
+    it('GET /api/users — lists users without passwords', async () => {
+      mockPrisma.user.findMany.mockResolvedValueOnce([
+        { id: 'user-1', username: 'alice', email: 'alice@test.com', password: 'secret' },
+      ]);
 
       const res = await request(app.getHttpServer()).get('/api/users');
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual([{ id: 'user-1' }]);
+      expect(res.body[0]).not.toHaveProperty('password');
+      expect(res.body[0].username).toBe('alice');
     });
 
-    it('GET /api/users/:id — returns a user', async () => {
-      mockPrisma.user.findUnique.mockResolvedValueOnce({ id: 'user-1' });
+    it('GET /api/users/:id — returns a user without password', async () => {
+      mockPrisma.user.findUnique.mockResolvedValueOnce({
+        id: 'user-1', username: 'alice', email: 'alice@test.com', password: 'secret',
+      });
 
       const res = await request(app.getHttpServer()).get('/api/users/user-1');
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ id: 'user-1' });
+      expect(res.body).not.toHaveProperty('password');
+      expect(res.body.username).toBe('alice');
     });
 
     it('PUT /api/users/:id — rejects without token', async () => {
@@ -347,6 +368,22 @@ describe('App (e2e)', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ message: 'Post saved successfully!' });
+    });
+
+    it('POST /api/users/save — returns 409 on race condition', async () => {
+      const p2002Error = new Prisma.PrismaClientKnownRequestError('Unique constraint', {
+        code: 'P2002',
+        clientVersion: '5.13.0',
+      });
+      mockPrisma.savedPost.findUnique.mockResolvedValueOnce(null);
+      mockPrisma.savedPost.create.mockRejectedValueOnce(p2002Error);
+
+      const res = await request(app.getHttpServer())
+        .post('/api/users/save')
+        .set('Cookie', validCookie)
+        .send({ postId: 'post-1' });
+
+      expect(res.status).toBe(409);
     });
 
     it('GET /api/users/notification — returns count', async () => {

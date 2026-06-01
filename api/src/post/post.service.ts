@@ -20,10 +20,10 @@ export class PostService {
           city: query.city || undefined,
           type: (query.type as any) || undefined,
           property: (query.property as any) || undefined,
-          bedroom: query.bedroom || undefined,
+          bedroom: query.bedroom !== undefined ? query.bedroom : undefined,
           price: {
-            gte: query.minPrice || 0,
-            lte: query.maxPrice || 999999999,
+            gte: query.minPrice !== undefined ? query.minPrice : 0,
+            lte: query.maxPrice !== undefined ? query.maxPrice : undefined,
           },
         },
       });

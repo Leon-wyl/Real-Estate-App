@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, ConflictException } from '@nestjs/common';
 import { AuthController } from '../../src/auth/auth.controller';
 import { AuthService } from '../../src/auth/auth.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { Prisma } from '@prisma/client';
 import { Response } from 'express';
 
 vi.mock('bcrypt', () => ({
@@ -58,6 +59,18 @@ describe('AuthController', () => {
       await expect(
         controller.register({ username: 'alice', email: 'alice@test.com', password: 'secret' }),
       ).rejects.toThrow();
+    });
+
+    it('returns 409 for duplicate user', async () => {
+      const p2002Error = new Prisma.PrismaClientKnownRequestError('Unique constraint', {
+        code: 'P2002',
+        clientVersion: '5.13.0',
+      });
+      (mockPrisma as any).user = { create: vi.fn().mockRejectedValue(p2002Error) };
+
+      await expect(
+        controller.register({ username: 'alice', email: 'alice@test.com', password: 'secret' }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 

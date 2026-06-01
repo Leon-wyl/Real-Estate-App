@@ -1,9 +1,11 @@
 import {
   Injectable,
+  ConflictException,
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,7 +15,8 @@ export class UserService {
 
   async findAll() {
     try {
-      return await this.prisma.user.findMany();
+      const users = await this.prisma.user.findMany();
+      return users.map(({ password: _password, ...rest }) => rest);
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException('Failed to get users!');
@@ -22,7 +25,10 @@ export class UserService {
 
   async findOne(id: string) {
     try {
-      return await this.prisma.user.findUnique({ where: { id } });
+      const user = await this.prisma.user.findUnique({ where: { id } });
+      if (!user) return null;
+      const { password: _password, ...rest } = user;
+      return rest;
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException('Failed to get user!');
@@ -94,6 +100,9 @@ export class UserService {
         return { message: 'Post saved successfully!' };
       }
     } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException('Post is already saved or unsaved');
+      }
       console.log(err);
       throw new InternalServerErrorException('Failed to save post!');
     }

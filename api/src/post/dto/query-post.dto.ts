@@ -15,17 +15,26 @@ export class QueryPostDto {
   property?: string;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10) || undefined)
+  @Transform(({ value }) => {
+    const n = parseInt(value, 10);
+    return isNaN(n) ? undefined : n;
+  })
   @IsInt()
   bedroom?: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10) || undefined)
+  @Transform(({ value }) => {
+    const n = parseInt(value, 10);
+    return isNaN(n) ? undefined : n;
+  })
   @IsInt()
   minPrice?: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10) || undefined)
+  @Transform(({ value }) => {
+    const n = parseInt(value, 10);
+    return isNaN(n) ? undefined : n;
+  })
   @IsInt()
   maxPrice?: number;
 }
