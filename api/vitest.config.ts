@@ -5,12 +5,4 @@ export default defineConfig({
     globals: true,
     environment: 'node',
   },
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        experimentalDecorators: true,
-        emitDecoratorMetadata: true,
-      },
-    },
-  },
 });
