@@ -6,7 +6,6 @@ import request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 
 vi.mock('bcrypt', () => ({
   hash: vi.fn().mockResolvedValue('hashed-password'),

@@ -6,7 +6,6 @@ import {
   IsEnum,
   IsOptional,
   ValidateNested,
-  IsNumber,
 } from 'class-validator';
 import { Type as PostType, Property } from '@prisma/client';
 

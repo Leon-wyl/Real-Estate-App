@@ -14,7 +14,6 @@ vi.mock('bcrypt', () => ({
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let service: AuthService;
 
   const mockPrisma = {} as any;
   const mockJwtService = {
@@ -33,7 +32,6 @@ describe('AuthController', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    service = module.get<AuthService>(AuthService);
     vi.clearAllMocks();
   });
 
