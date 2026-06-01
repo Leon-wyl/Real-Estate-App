@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from './prisma/prisma.module';
+import { SocketModule } from './socket/socket.module';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
@@ -17,6 +18,7 @@ import { AppController } from './app.controller';
       global: true,
     }),
     PrismaModule,
+    SocketModule,
     AuthModule,
     PostModule,
     UserModule,

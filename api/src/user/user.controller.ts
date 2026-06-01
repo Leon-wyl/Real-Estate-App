@@ -7,6 +7,8 @@ import {
   Param,
   Body,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -54,6 +56,7 @@ export class UserController {
   }
 
   @Post('save')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   savePost(
     @Body() dto: SavePostDto,
