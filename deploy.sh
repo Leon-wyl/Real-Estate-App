@@ -49,8 +49,8 @@ case "$1" in
         
         echo -e "${BLUE}2. Building Frontend...${NC}"
         cd ../client
-        npm install
-        npm run build
+        pnpm install
+        pnpm build
         
         echo -e "${BLUE}3. Syncing to S3...${NC}"
         aws s3 sync ./dist s3://leonrealestate-web --delete

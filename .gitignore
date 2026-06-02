@@ -8,4 +8,9 @@ node_modules
 *.tfstate.backup
 *.tfvars
 
-command.xml.worktrees/
+command.xml
+.worktrees/
+
+.opencode/
+.superpowers/
+.worktrees/

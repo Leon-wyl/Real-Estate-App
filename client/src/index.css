@@ -3,16 +3,68 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply p-0 m-0 box-border;
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 43 74% 49%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --gold: 43 74% 49%;
+    --gold-muted: 43 30% 35%;
+    --surface: 0 0% 8%;
+    --border: 0 0% 18%;
+    --input: 0 0% 14%;
+    --ring: 43 74% 49%;
+    --radius: 0.5rem;
   }
 
-  a {
-    @apply no-underline text-inherit;
+  * {
+    @apply border-border;
   }
 
   body {
-    font-family: "Lato", sans-serif;
-    @apply overflow-hidden;
+    @apply bg-background font-body text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .gold-gradient-text {
+    @apply bg-gradient-to-r from-gold via-yellow-200 to-gold bg-clip-text text-transparent;
+  }
+
+  .gold-border {
+    @apply border border-gold/30;
+  }
+
+  .luxury-card {
+    @apply rounded-lg border border-border bg-card p-6 shadow-lg transition-all duration-300 hover:border-gold/30 hover:shadow-gold/10;
+  }
+
+  .page-shell {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply font-display text-2xl font-bold text-foreground sm:text-3xl;
+  }
+
+  .section-subtitle {
+    @apply mt-2 font-body text-muted-foreground;
   }
 }
