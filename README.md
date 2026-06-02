@@ -15,7 +15,7 @@ This project is a modern real estate platform that allows users to search for pr
 - **Deployment:** Hosted on **AWS S3** and distributed globally via **AWS CloudFront**.
 
 ### Backend
-- **Runtime:** Node.js (Express)
+- **Runtime:** Node.js (NestJS)
 - **Database:** MongoDB with **Prisma ORM**
 - **Authentication:** JWT with HTTP-only cookies
 - **Deployment:** Containerized service on **AWS App Runner**.
@@ -27,7 +27,7 @@ This project is a modern real estate platform that allows users to search for pr
 
 ## Project Structure
 
-- `/api`: Express.js backend.
+- `/api`: NestJS backend.
 - `/client`: React frontend.
 - `/terraform`: AWS infrastructure configuration files.
 
@@ -43,8 +43,9 @@ This project is a modern real estate platform that allows users to search for pr
    ```bash
    cd api
    npm install
-   # Configure .env
-   node app.js
+   npx prisma generate
+   npx prisma db push
+   npm run dev
    ```
 2. **Frontend:**
    ```bash

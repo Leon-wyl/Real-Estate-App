@@ -1,12 +1,39 @@
 # Real Estate App - Full Stack Project
 
-A comprehensive real estate listing application with a React frontend, Node.js/Express backend, and AWS cloud infrastructure.
+A comprehensive real estate listing application with a React frontend, Node.js/NestJS backend, and AWS cloud infrastructure.
 
 ## Tech Stack
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS, Axios, Leaflet.
-- **Backend:** Node.js, TypeScript, Express, Prisma, MongoDB.
+- **Backend:** Node.js, TypeScript, NestJS (CommonJS), Prisma, MongoDB, Passport JWT, Socket.io.
 - **Cloud:** AWS (App Runner, S3, CloudFront, ECR, Route 53, ACM).
 - **Domain:** `leonrealestate.uk` (managed via Cloudflare & AWS).
+
+## Project Structure
+
+```
+/api/
+  src/
+    main.ts              # Entry point: dotenv, cookieParser, CORS, global prefix, ValidationPipe
+    app.module.ts        # Root module: global JwtModule + all feature modules
+    auth/                # Passport JWT (cookie extractor), guards, CurrentUser decorator
+    post/                # Post CRUD with ownership checks
+    user/                # User management (notification before :id)
+    chat/                # WebSocket gateway (JwtService auth), chat CRUD
+    message/             # Message validation, membership check, socket emit
+    socket/              # @Global SocketModule: null-safe IO wrapper
+    prisma/              # @Global PrismaModule
+    test/                # Test routes (guard, manual JWT)
+  prisma/schema.prisma   # MongoDB schema
+  test/                  # Unit (6 files) + E2E (1 file)
+/client/
+  src/lib/apiRequest.ts  # Axios instance (baseURL: VITE_API_URL || "/api")
+  vite.config.js         # Dev proxy: /api → localhost:8800
+  .env.production        # VITE_API_URL=https://api.leonrealestate.uk/api
+/terraform/
+  main.tf                # App Runner, ECR, IAM
+  frontend.tf            # S3, CloudFront, ACM
+deploy.sh                # Unified deploy script
+```
 
 ## Quick Start (Local)
 
@@ -46,9 +73,14 @@ domain_name    = "leonrealestate.uk"
 ```
 
 ## Testing
-- **Backend unit tests:** `cd api && npm run test:controllers`
-- **Backend integration tests:** `cd api && npm run test:api`
-- **All backend tests:** `cd api && npm test`
+- **All tests:** `cd api && npm test` (Vitest, 103 tests: 58 unit + 45 e2e)
+- **Build check:** `cd api && npm run build` (nest build)
+- **Lint:** `cd api && npm run lint`
+
+## Key Details
+- **Auth:** Cookie-based JWT (`sameSite:none; secure:true`). Dev uses Vite proxy for same-origin.
+- **POST routes:** All use `@HttpCode(HttpStatus.OK)` (NestJS defaults POST to 201).
+- **Docker:** Multi-stage build compiles TS → `dist/src/main.js`, then runs via `node`.
 
 ## Constraints
 - Absolute Minimalism: Do not over-engineer. Only make changes that are directly requested or strictly necessary.
