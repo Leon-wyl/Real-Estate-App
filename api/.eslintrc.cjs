@@ -11,8 +11,8 @@ module.exports = {
     es2022: true,
   },
   rules: {
-    // Custom rules can be added here
     '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

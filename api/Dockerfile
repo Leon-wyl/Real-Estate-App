@@ -39,4 +39,4 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 8800
 
 # Run the compiled code
-CMD ["npm", "start"]
+CMD ["node", "dist/src/main.js"]
